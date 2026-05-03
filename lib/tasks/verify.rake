@@ -20,10 +20,14 @@ namespace :verify do
     missed     = expected.count { |k, v| actual[k] < v }
     duplicates = actual.count  { |k, v| v > expected.fetch(k, 0) }
 
+    expected_total = expected.values.sum
+    actual_total   = actual.values.sum
+
     puts ""
     puts "===== Ground Truth Verification ====="
-    puts "  Expected alert keys : #{expected.size}"
-    puts "  Actual alert keys   : #{actual.size}"
+    puts "  Expected rules      : #{expected.size}"
+    puts "  Expected total alerts: #{expected_total}"
+    puts "  Actual total alerts : #{actual_total}"
     puts "  Missed              : #{missed}"
     puts "  Duplicates          : #{duplicates}"
     puts "  Result              : #{missed == 0 && duplicates == 0 ? 'PASS' : 'FAIL'}"
