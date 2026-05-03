@@ -58,6 +58,33 @@ namespace :seed do
 
     SubscriptionRule.insert_all(rules)
 
+    expected_alerts = Hash.new(0)
+
+    rules.each do |rule|
+      prices = symbol_prices[rule[:currency_symbol]]
+      direction = SubscriptionRule.directions.key(rule[:direction])
+      threshold = rule[:threshold_value]
+      triggered = false
+
+      prices.each do |price|
+        crossed = case direction
+                  when "above" then price >= threshold
+                  when "below" then price <= threshold
+                  else false
+                  end
+
+        if crossed && !triggered
+          triggered = true
+          expected_alerts["#{rule[:customer_id]}:#{rule[:currency_symbol]}"] += 1
+        elsif !crossed && triggered
+          triggered = false
+        end
+      end
+    end
+
+    expected_path = File.join(File.dirname(trace_file), "expected_alerts.json")
+    File.write(expected_path, expected_alerts.to_json)
+
     above_count = rules.count { |r| r[:direction] == SubscriptionRule.directions["above"] }
     below_count = rules.count { |r| r[:direction] == SubscriptionRule.directions["below"] }
 
@@ -66,5 +93,6 @@ namespace :seed do
     puts "  Above: #{above_count}"
     puts "  Below: #{below_count}"
     puts "  Symbols covered: #{rules.map { |r| r[:currency_symbol] }.uniq.size}"
+    puts "  Expected alerts written to: #{expected_path}"
   end
 end
