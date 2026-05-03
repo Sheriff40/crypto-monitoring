@@ -1,5 +1,5 @@
 class Pipeline
-  attr_reader :index
+  attr_reader :index, :messages_processed
 
   def initialize(alert_emitter: nil)
     @parser = MessageParser.new

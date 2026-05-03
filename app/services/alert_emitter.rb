@@ -1,4 +1,6 @@
 class AlertEmitter
+  attr_reader :alert_count, :latencies
+
   def initialize(log_path: nil)
     @log_path = log_path || Rails.root.join("log", "alerts.log")
     @logger = Logger.new(@log_path)
