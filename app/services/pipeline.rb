@@ -1,4 +1,6 @@
 class Pipeline
+  attr_reader :index
+
   def initialize(alert_emitter: nil)
     @parser = MessageParser.new
     @index = SubscriptionIndex.new
