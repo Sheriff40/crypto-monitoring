@@ -32,3 +32,4 @@
 /config/*.key
 
 .idea/
+traces/
