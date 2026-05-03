@@ -82,7 +82,7 @@ namespace :seed do
       end
     end
 
-    expected_path = File.join(File.dirname(trace_file), "expected_alerts.json")
+    expected_path = Rails.root.join("log", "expected_alerts_#{rule_count}_rules.json")
     File.write(expected_path, expected_alerts.to_json)
 
     above_count = rules.count { |r| r[:direction] == SubscriptionRule.directions["above"] }

@@ -7,12 +7,15 @@ namespace :benchmark do
 
     abort "No trace file found." unless trace_file && File.exist?(trace_file)
 
-    emitter  = AlertEmitter.new(log_path: Rails.root.join("log", "alerts_benchmark.log"))
+    rule_count = SubscriptionRule.count
+    log_path   = Rails.root.join("log", "alerts_#{rule_count}_rules.log")
+
+    emitter  = AlertEmitter.new(log_path: log_path)
     pipeline = Pipeline.new(alert_emitter: emitter)
     pipeline.setup
 
-    rule_count = SubscriptionRule.count
     puts "[Benchmark] #{label} | rules=#{rule_count} | trace=#{File.basename(trace_file)}"
+    puts "[Benchmark] Alert log: #{log_path}"
 
     replayer = TraceReplayer.new(pipeline: pipeline, rate: rate)
 
