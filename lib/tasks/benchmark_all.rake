@@ -19,7 +19,7 @@ namespace :benchmark do
       Rake::Task["seed:from_trace"].invoke(trace_file, rule_count)
 
       Rake::Task["benchmark:run"].reenable
-      Rake::Task["benchmark:run"].invoke(trace_file, 1.0, "rules=#{rule_count}")
+      Rake::Task["benchmark:run"].invoke(trace_file, "rules=#{rule_count}")
 
       Rake::Task["verify:ground_truth"].reenable
       Rake::Task["verify:ground_truth"].invoke(expected_file, alert_log)
