@@ -33,7 +33,7 @@ namespace :benchmark do
     p50        = percentile(latencies, 50)
     p95        = percentile(latencies, 95)
     p99        = percentile(latencies, 99)
-    throughput = (pipeline.messages_processed / wall_elapsed).round(2)
+    throughput = (pipeline.ticks_processed / wall_elapsed).round(2)
 
     puts ""
     puts "===== Benchmark Results: #{label} ====="
@@ -86,7 +86,7 @@ namespace :benchmark do
     p50        = percentile(latencies, 50)
     p95        = percentile(latencies, 95)
     p99        = percentile(latencies, 99)
-    throughput = (pipeline.messages_processed / wall_elapsed).round(2)
+    throughput = (pipeline.ticks_processed / wall_elapsed).round(2)
 
     puts ""
     puts "===== Burst Benchmark Results: #{label} ====="

@@ -1,5 +1,5 @@
 class Pipeline
-  attr_reader :index, :messages_processed
+  attr_reader :index, :messages_processed, :ticks_processed
 
   def initialize(alert_emitter: nil)
     @parser = MessageParser.new
@@ -7,6 +7,7 @@ class Pipeline
     @emitter = alert_emitter || AlertEmitter.new
     @evaluator = RuleEvaluator.new(alert_emitter: @emitter)
     @messages_processed = 0
+    @ticks_processed = 0
   end
 
   def setup
@@ -16,6 +17,7 @@ class Pipeline
   def process(raw_json, ingested_at:)
     ticks = @parser.parse(raw_json)
     @messages_processed += 1
+    @ticks_processed += ticks.size
 
     ticks.each do |tick|
       rules = @index.rules_for(tick.symbol)
