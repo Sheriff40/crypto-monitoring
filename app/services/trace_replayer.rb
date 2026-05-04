@@ -1,6 +1,8 @@
 class TraceReplayer
-  def initialize(pipeline:)
-    @pipeline = pipeline
+  def initialize(pipeline:, burst_at: [], burst_size: 0)
+    @pipeline   = pipeline
+    @burst_at   = burst_at
+    @burst_size = burst_size
   end
 
   attr_reader :schedule_misses
@@ -9,7 +11,8 @@ class TraceReplayer
     lines = File.readlines(trace_path)
     total = lines.size
     previous_recorded_at = nil
-    @schedule_misses = 0
+    burst_start_time     = nil
+    @schedule_misses     = 0
 
     Rails.logger.info "[Replay] Starting replay of #{total} messages"
 
@@ -17,11 +20,16 @@ class TraceReplayer
       record = JSON.parse(line)
       current_recorded_at = record["recorded_at"]
 
-      ingested_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      if burst_window_start?(i)
+        burst_start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      end
+
+      ingested_at = in_burst?(i) ? burst_start_time : Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
       @pipeline.process(record["data"], ingested_at: ingested_at)
       processing_time = Process.clock_gettime(Process::CLOCK_MONOTONIC) - ingested_at
 
-      if previous_recorded_at
+      if previous_recorded_at && !in_burst?(i)
         delay = (current_recorded_at - previous_recorded_at) - processing_time
         if delay > 0
           sleep(delay)
@@ -36,5 +44,15 @@ class TraceReplayer
     end
 
     puts "\n[Replay] Complete. #{total} messages replayed."
+  end
+
+  private
+
+  def in_burst?(index)
+    @burst_at.any? { |start| index >= start && index < start + @burst_size }
+  end
+
+  def burst_window_start?(index)
+    @burst_at.include?(index)
   end
 end
