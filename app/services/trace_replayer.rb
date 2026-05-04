@@ -3,10 +3,13 @@ class TraceReplayer
     @pipeline = pipeline
   end
 
+  attr_reader :schedule_misses
+
   def replay(trace_path)
     lines = File.readlines(trace_path)
     total = lines.size
     previous_recorded_at = nil
+    @schedule_misses = 0
 
     Rails.logger.info "[Replay] Starting replay of #{total} messages"
 
@@ -20,7 +23,11 @@ class TraceReplayer
 
       if previous_recorded_at
         delay = (current_recorded_at - previous_recorded_at) - processing_time
-        sleep(delay) if delay > 0
+        if delay > 0
+          sleep(delay)
+        else
+          @schedule_misses += 1
+        end
       end
 
       previous_recorded_at = current_recorded_at
