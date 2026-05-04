@@ -3,7 +3,9 @@ class AlertEmitter
 
   def initialize(log_path: nil)
     @log_path = log_path || Rails.root.join("log", "alerts.log")
-    @logger = Logger.new(File.open(@log_path, "w"))
+    file      = File.open(@log_path, "w")
+    file.sync = true
+    @logger   = Logger.new(file)
     @logger.formatter = proc { |_sev, _time, _prog, msg| "#{msg}\n" }
     @alert_count = 0
     @latencies = []
