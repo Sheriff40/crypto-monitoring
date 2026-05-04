@@ -1,7 +1,6 @@
 class TraceReplayer
-  def initialize(pipeline:, rate: 1.0)
+  def initialize(pipeline:)
     @pipeline = pipeline
-    @rate = rate.to_f
   end
 
   def replay(trace_path)
@@ -9,7 +8,7 @@ class TraceReplayer
     total = lines.size
     previous_recorded_at = nil
 
-    Rails.logger.info "[Replay] Starting replay of #{total} messages at #{@rate}x rate"
+    Rails.logger.info "[Replay] Starting replay of #{total} messages"
 
     lines.each_with_index do |line, i|
       record = JSON.parse(line)
@@ -20,7 +19,7 @@ class TraceReplayer
       processing_time = Process.clock_gettime(Process::CLOCK_MONOTONIC) - ingested_at
 
       if previous_recorded_at
-        delay = (current_recorded_at - previous_recorded_at) / @rate - processing_time
+        delay = (current_recorded_at - previous_recorded_at) - processing_time
         sleep(delay) if delay > 0
       end
 

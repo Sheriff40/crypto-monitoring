@@ -1,8 +1,7 @@
 namespace :benchmark do
   desc "Run replay benchmark at a given rule count label"
-  task :run, [:trace_file, :rate, :label] => :environment do |_t, args|
+  task :run, [:trace_file, :label] => :environment do |_t, args|
     trace_file = args[:trace_file] || Dir.glob(Rails.root.join("traces", "*.jsonl")).max
-    rate       = (args[:rate] || 1.0).to_f
     label      = args[:label] || "rules=#{SubscriptionRule.count}"
 
     abort "No trace file found." unless trace_file && File.exist?(trace_file)
@@ -17,7 +16,7 @@ namespace :benchmark do
     puts "[Benchmark] #{label} | rules=#{rule_count} | trace=#{File.basename(trace_file)}"
     puts "[Benchmark] Alert log: #{log_path}"
 
-    replayer = TraceReplayer.new(pipeline: pipeline, rate: rate)
+    replayer = TraceReplayer.new(pipeline: pipeline)
 
     cpu_before = Process.times
     wall_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
