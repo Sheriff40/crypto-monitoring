@@ -42,7 +42,6 @@ namespace :benchmark do
     puts "  Wall time          : #{wall_elapsed.round(2)}s"
     puts "  Throughput         : #{throughput} msg/s"
     puts "  Alerts fired       : #{emitter.alert_count}"
-    puts "  Backpressure events: #{replayer.backpressure_events}"
     puts "  Latency p50        : #{p50} ms"
     puts "  Latency p95        : #{p95} ms"
     puts "  Latency p99        : #{p99} ms"
