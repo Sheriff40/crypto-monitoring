@@ -68,7 +68,8 @@ namespace :benchmark do
     abort "No trace file found." unless trace_file && File.exist?(trace_file)
 
     total_messages = File.readlines(trace_file).size
-    burst_at = [0, total_messages / 2]
+    interval = total_messages / 5
+    burst_at = (1..4).map { |i| i * interval }
 
     rule_count = SubscriptionRule.count
     log_path   = Rails.root.join("log", "alerts_burst_#{rule_count}_rules.log")
