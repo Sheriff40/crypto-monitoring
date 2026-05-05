@@ -1,3 +1,5 @@
+require "csv"
+
 namespace :benchmark do
   desc "Run replay benchmark at a given rule count label"
   task :run, [:trace_file, :label] => :environment do |_t, args|
@@ -46,6 +48,14 @@ namespace :benchmark do
     puts "  Latency p99        : #{p99} ms"
     puts "  CPU utilisation    : #{cpu_utilisation}%"
     puts "======================================="
+
+    csv_path = Rails.root.join("log", "benchmark_results.csv")
+    write_header = !File.exist?(csv_path)
+    CSV.open(csv_path, "a") do |csv|
+      csv << %w[timestamp type rules messages throughput_ticks_s alerts p50_ms p95_ms p99_ms cpu_pct trace] if write_header
+      csv << [Time.now.iso8601, "steady", rule_count, pipeline.messages_processed, throughput, emitter.alert_count, p50, p95, p99, cpu_utilisation, File.basename(trace_file)]
+    end
+    puts "[CSV] Results appended to #{csv_path}"
   end
 
   desc "Run burst injection benchmark at a fixed rule count"
@@ -102,6 +112,14 @@ namespace :benchmark do
     puts "  Latency p99        : #{p99} ms"
     puts "  CPU utilisation    : #{cpu_utilisation}%"
     puts "============================================="
+
+    csv_path = Rails.root.join("log", "benchmark_results.csv")
+    write_header = !File.exist?(csv_path)
+    CSV.open(csv_path, "a") do |csv|
+      csv << %w[timestamp type rules messages throughput_ticks_s alerts p50_ms p95_ms p99_ms cpu_pct trace] if write_header
+      csv << [Time.now.iso8601, "burst", rule_count, pipeline.messages_processed, throughput, emitter.alert_count, p50, p95, p99, cpu_utilisation, File.basename(trace_file)]
+    end
+    puts "[CSV] Results appended to #{csv_path}"
   end
 
   private
