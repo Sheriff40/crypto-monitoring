@@ -47,13 +47,14 @@ namespace :benchmark do
     puts "  Latency p95        : #{p95} ms"
     puts "  Latency p99        : #{p99} ms"
     puts "  CPU utilisation    : #{cpu_utilisation}%"
+    puts "  Schedule misses    : #{replayer.schedule_misses}"
     puts "======================================="
 
     csv_path = Rails.root.join("log", "benchmark_results.csv")
     write_header = !File.exist?(csv_path)
     CSV.open(csv_path, "a") do |csv|
-      csv << %w[timestamp type rules messages throughput_ticks_s alerts p50_ms p95_ms p99_ms cpu_pct trace] if write_header
-      csv << [Time.now.iso8601, "steady", rule_count, pipeline.messages_processed, throughput, emitter.alert_count, p50, p95, p99, cpu_utilisation, File.basename(trace_file)]
+      csv << %w[timestamp type rules messages throughput_ticks_s alerts p50_ms p95_ms p99_ms cpu_pct schedule_misses trace] if write_header
+      csv << [Time.now.iso8601, "steady", rule_count, pipeline.messages_processed, throughput, emitter.alert_count, p50, p95, p99, cpu_utilisation, replayer.schedule_misses, File.basename(trace_file)]
     end
     puts "[CSV] Results appended to #{csv_path}"
   end
@@ -116,8 +117,8 @@ namespace :benchmark do
     csv_path = Rails.root.join("log", "benchmark_results.csv")
     write_header = !File.exist?(csv_path)
     CSV.open(csv_path, "a") do |csv|
-      csv << %w[timestamp type rules messages throughput_ticks_s alerts p50_ms p95_ms p99_ms cpu_pct trace] if write_header
-      csv << [Time.now.iso8601, "burst", rule_count, pipeline.messages_processed, throughput, emitter.alert_count, p50, p95, p99, cpu_utilisation, File.basename(trace_file)]
+      csv << %w[timestamp type rules messages throughput_ticks_s alerts p50_ms p95_ms p99_ms cpu_pct schedule_misses trace] if write_header
+      csv << [Time.now.iso8601, "burst", rule_count, pipeline.messages_processed, throughput, emitter.alert_count, p50, p95, p99, cpu_utilisation, replayer.schedule_misses, File.basename(trace_file)]
     end
     puts "[CSV] Results appended to #{csv_path}"
   end
