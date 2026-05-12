@@ -16,6 +16,8 @@
 !/log/.keep
 !/tmp/.keep
 !/log/*.csv
+!/log/alerts_*.log
+!/log/expected_alerts_*.json
 
 # Ignore pidfiles, but keep the directory.
 /tmp/pids/*
