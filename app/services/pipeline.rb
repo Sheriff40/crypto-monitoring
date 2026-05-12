@@ -17,6 +17,7 @@ class Pipeline
   def process(raw_json, ingested_at:)
     ticks = @parser.parse(raw_json)
     @messages_processed += 1
+    # record ticks processed to get the throughput (ticks/s)
     @ticks_processed += ticks.size
 
     ticks.each do |tick|

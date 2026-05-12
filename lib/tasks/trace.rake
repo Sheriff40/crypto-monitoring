@@ -24,6 +24,7 @@ namespace :trace do
 
       ws.on :message do |event|
         recorded_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        # record the timestamp to simulate the inter-arrival delay of messages during benchmarks
         file.puts({ recorded_at:, data: event.data }.to_json)
         message_count += 1
         print "\rMessages recorded: #{message_count}" if message_count % 10 == 0

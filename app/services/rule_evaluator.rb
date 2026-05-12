@@ -7,10 +7,11 @@ class RuleEvaluator
     rules.each do |rule|
       triggered_now = threshold_crossed?(tick.price, rule.threshold_value, rule.direction)
 
-      if triggered_now && !rule.triggered
+      if triggered_now && !rule.triggered # if not already in triggered state, trigger the rule (helps avoid duplicate alerts)
         rule.triggered = true
         @alert_emitter.emit(rule:, tick:, ingested_at:)
       elsif !triggered_now && rule.triggered
+        # reset the rule so that it can be re-triggered on the next crossing
         rule.triggered = false
       end
     end

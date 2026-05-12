@@ -20,6 +20,8 @@ namespace :seed do
 
     puts "Found #{symbol_prices.size} symbols in trace"
 
+    # only create rules for symbols which have price movements
+    # Reason: A symbol without any movement in the market will never trigger any rule
     triggerable_symbols = symbol_prices.select { |_sym, prices| prices.uniq.size > 1 }
 
     puts "#{triggerable_symbols.size} symbols have price movement"
@@ -57,6 +59,9 @@ namespace :seed do
     end
 
     SubscriptionRule.insert_all(rules)
+
+    # setup the deterministic ground truth
+    # store the expected alerts per symbol
 
     expected_alerts = Hash.new(0)
 

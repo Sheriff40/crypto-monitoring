@@ -24,11 +24,15 @@ class TraceReplayer
         burst_start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       end
 
+      # on burst conditions, set the same ingested_at for the "burst_size:param" size of messages
+      # this helps to account for the waiting time in queue when the prev messages are being processed
       ingested_at = in_burst?(i) ? burst_start_time : Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
       @pipeline.process(record["data"], ingested_at: ingested_at)
       processing_time = Process.clock_gettime(Process::CLOCK_MONOTONIC) - ingested_at
 
+      # do not sleep for burst conditions and immediately start processing the next message
+      # if not in burst condition, calculate the inter-arrival time gap between messages, and simulate it by pausing the process
       if previous_recorded_at && !in_burst?(i)
         delay = (current_recorded_at - previous_recorded_at) - processing_time
         if delay > 0
