@@ -29,9 +29,4 @@ class AlertEmitter
       latency_ms: latency_ms
     }.to_json)
   end
-
-  def reset_stats
-    @alert_count = 0
-    @latencies = []
-  end
 end
